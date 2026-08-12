@@ -1,11 +1,208 @@
 ---
-title: "AC_PNAES_26"
+title: Painel de Acompanhamento Pesquisa de Diversidade 2026
+format: 
+  dashboard:
+    scrolling: true
+    lang: pt-br
+    expandable: false
+include-in-header: css/custom-theme.css
+navbar: false
+server: shiny
 ---
 
-## Quarto
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
 
 ```{r}
-1 + 1
+#| label: importar
+#| message: false
+#| context: setup
+
+library(shiny)
+library(bslib)
+library(bsicons)
+options(box.path = here::here())
+
+box::use(
+  dplyr[`%>%`,
+        filter,
+        mutate] 
+)
+
+
 ```
+
+
+```{r}
+#| label: carregar-dados
+#| message: false
+#| context: setup
+
+
+box::use(
+  modulos/carregar_dados[...]
+)
+
+```
+
+
+
+```{r}
+#| label: carregar-visualizacoes
+#| message: false
+#| context: setup
+
+box::use(
+  modulos/caixas_acessos,
+  modulos/global,
+  modulos/grafico_taxa,
+  modulos/tp_aparelho
+)
+
+
+```
+
+## Row {height="5%"}
+
+```{r}
+#| label: "Titulo do Relatorio"
+```
+![](images/banner.svg){width="100%"}
+
+## Row {height = "5%"}
+```{r}
+#| label: "Selecao-DR"
+
+div(id = "cabecalho",
+    selectizeInput(
+      inputId = "DR",
+      label = "Departamento Regional",
+      choices = opcoes,
+      options = list(dropdownParent = 'body', optgroupField = 'group')
+    ),
+    uiOutput("unidade_selecao"),
+    selectizeInput(
+      inputId = "Semestre",
+      label = "Semestre",
+      choices = opcoes_sm,
+      options = list(dropdownParent = 'body', optgroupField = 'group')
+    )
+)
+
+
+```
+
+## Row {height="11%"}
+
+```{r}
+#| label: primeiro-segmento
+uiOutput("PrimeiroSegmento")
+
+```
+
+```{r}
+#| label: processa-dados-primeiro-segmento
+#| context: server
+
+
+DR_selecionado <- reactive({
+  req(input$DR)
+  req(!is.null(input$DR))
+  
+  input$DR
+
+})
+
+SM_selecionado <- reactive({
+  req(input$Semestre)
+  req(is.null(input$Semestre))
+})
+
+
+populacao_filtrada <- reactive({
+  print(DR_selecionado())
+  
+  saida <- dados_populacao %>% 
+    filter(DR == DR_selecionado()) %>% 
+    filter(cod.unidade == unidade_selecionado())
+  
+  saida
+
+})
+
+
+dados_filtrado <- reactive({
+
+  req(DR_selecionado())
+  saida <- dados_primarios()
+
+  
+if(DR_selecionado() != "BR"){
+saida <- saida %>% 
+            filter(DR == DR_selecionado())
+} else {
+  
+return(saida %>% mutate(Total = total.dr))
+  
+}
+  })
+
+```
+
+
+
+## Row {height="33%"}
+
+```{r}
+#| label: segundo-segmento
+
+card(
+  card_header("Informações do acesso ao questionário"),
+  card_body(
+    layout_columns(
+      col_widths = c(3, 5, 4),
+      caixas_acessos$ui("SegundoSegmento-Caixas"),
+      card(id = "grafico-taxa-resposta",
+        height = "320px",
+        card_body_fill(
+          grafico_taxa$ui("SegundoSegmento-Acessos")
+        )
+      ),
+      card(
+        max_height = "600px",
+        card_body(id = "tipo-de-aparelho",
+          tp_aparelho$ui("SegundoSegmento-TipoDeAparelho")
+        )
+        
+      )
+    )
+  )
+)
+
+```
+
+
+```{r}
+#| label: processa-dados-segundo-segmento
+#| context: server
+
+caixas_acessos$server("SegundoSegmento-Caixas", 
+                      dados_filtrado)
+
+grafico_taxa$server("SegundoSegmento-Acessos",
+                    dados_filtrado,
+                    DR_selecionado)
+
+tp_aparelho$server("SegundoSegmento-TipoDeAparelho",
+                   dados_filtrado,
+                   DR_selecionado) 
+
+```
+
+
+
+
+
+
+
+
+
