@@ -1,0 +1,157 @@
+<style title="custom.css">
+#cabecalho {
+  min-height: 80px;
+  flex-direction: row;
+  gap: 15%;
+  justify-content: flex-start;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.page-layout-custom {
+  padding: 0 !important;
+}
+
+body {
+  background-image: url('images/plano_de_fundo_div.svg');
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+
+div.bslib-grid:nth-child(3) > div:nth-child(1) > div:nth-child(1) {
+  padding: 0 !important;
+}
+div.bslib-grid:nth-child(5) > div:nth-child(1) > div:nth-child(1){
+  padding: 0 !important;
+}
+
+.page-layout-custom > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) {
+padding: 0;
+}
+
+
+
+.selectize-dropdown,
+.selectize-input,
+.selectize-input input {
+  line-height:1.5;
+}
+
+.navbar {
+  display: none;
+}
+
+.navbar-title {
+  display: none;
+}
+
+:root {
+  --bs-body-bg: #FAFAFF;
+  
+}
+
+
+.bslib-grid-item.html-fill-item.bslib-grid{
+  grid-template-rows: unset !important;;
+}
+
+.quarto-dashboard .card .card-body {
+  z-index: 0;
+}
+
+
+.bslib-card, .tab-content, .tab-pane, .card-body {
+  overflow: visible !important;
+}
+
+
+h1#titulo{
+    text-align: left;
+    color: black;
+    position: relative;
+    align-content: center;
+}
+
+img {
+  align-self: center;
+}
+
+#grafico-taxa-resposta, 
+#tipo-de-aparelho,
+#tabela-terceiro-segmento,
+#unidade-terceiro-segmento {
+  border: 1px solid #888;
+}
+
+.control-label {
+  font-weight: bold;
+}
+
+
+.card {  
+  --bs-card-cap-bg: #8853c3;
+  --bs-card-bg: #FAFAFF;
+  --bs-card-cap-color: #FAFAFF;
+  border: 0;
+}
+
+.card-body {
+  overflow: hidden;
+}
+
+.card .card-header{
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.bslib-value-box.bg-custom {
+  border-radius: 1rem;         /* Arredondamento das bordas */
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) ;  /* Sombra suave */
+  transition: transform 0.4s;      /* Animação de transição */
+}
+
+/* Efeito hover nas value boxes */
+.bslib-value-box.bg-custom:hover {
+  transform: translateY(-2px);     /* Eleva o elemento ao passar o mouse */
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.25);  /* Aumenta a sombra */
+}
+
+/* Título das value boxes */
+.bslib-value-box.bg-custom .value-box-title {
+  font-size: 0.875rem;             /* Tamanho da fonte do título (14px) */
+  font-weight: 600;                /* Peso da fonte (semi-bold) */
+  text-transform: uppercase;       /* Texto em maiúsculas */
+  letter-spacing: 0.5px;           /* Espaçamento entre letras */
+  margin-bottom: 0.5rem;           /* Margem inferior */
+}
+
+/* Valor das value boxes */
+.bslib-value-box.bg-custom .value-box-value {
+  font-size: 2rem;                 /* Tamanho grande para o valor (32px) */
+  font-weight: 700;                /* Peso da fonte (bold) */
+  line-height: 1.2;                /* Altura da linha compacta */
+}
+
+/* Ícone showcase das value boxes */
+.bslib-value-box.bg-custom .value-box-showcase {
+  font-size: 3rem;                 /* Tamanho do ícone (48px) */
+  opacity: 0.8;                    /* Opacidade do ícone */
+}
+@media (max-width: 1500px) {
+  img {
+    width: 75% !important;
+  }
+}
+@media (max-width: 1000px) {
+  img {
+    width: 100% !important;
+  }
+}
+
+
+</style>

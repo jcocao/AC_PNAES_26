@@ -2,21 +2,74 @@ box::use(
   shiny[h3,
         HTML,
         tags],
-  dplyr[`%>%`,
-        rename]
+  dplyr[...]
 )
+
+
 
 #' @export
 brasil <- readRDS("data/br_uf_shape.Rds")
 
 
 #' @export
-dados_populacao <- readRDS("data/dados_p.rds") %>% 
-  rename(DR = DR2)
+dados_populacao <- readRDS("data/dados_p.rds") 
+
+#' @export
+dados_populacao <- dados_populacao %>% 
+  rename(DR = DR2) %>%
+  bind_rows(
+    dados_populacao %>%
+      group_by(semestre) %>%
+      summarise(
+        DR = "BR",
+        pop_a = sum(pop_a, na.rm = TRUE),
+        pop_p = sum(pop_p, na.rm = TRUE),
+        tx = pop_p / pop_a,
+        .groups = "drop"
+      )
+  ) %>% 
+  mutate(validos = "validos")
+  
 
 
 #' @export
-dados_primarios <- readRDS("data/dados.rds")
+dados_primarios <- readRDS("data/dados.rds") 
+  # %>% 
+  # bind_rows(
+  #   # BR por semestre
+  #   dados %>%
+  #     distinct(semestre, DR, Total) %>%
+  #     group_by(semestre) %>%
+  #     summarise(
+  #       DR = "BR",
+  #       Total = sum(Total, na.rm = TRUE),
+  #       .groups = "drop"
+  #     ),
+  #   
+  #   # BR geral
+  #   dados %>%
+  #     distinct(semestre, DR, Total) %>%
+  #     summarise(
+  #       semestre = NA_real_,
+  #       DR = "BR",
+  #       Total = sum(Total, na.rm = TRUE),
+  #       .groups = "drop"
+  #     )
+  # )
+  
+
+
+
+
+# dados_filtrado <- dados %>% 
+#   group_by(semestre, DR) %>%
+#   summarise(
+#     total_acessos = n(),
+#     tempo_medio = mean(`tempo`, na.rm = TRUE),
+#     tempo_mediano = median(`tempo`, na.rm = TRUE),
+#     .groups = "drop"
+#   )
+
 
 #' @export
 pop1 <- 400000

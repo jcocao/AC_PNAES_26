@@ -10,7 +10,7 @@ box::use(
 )
 
 box::use(
-  modulos/global[...]
+  ./global[...]
 )
 
 #' @export

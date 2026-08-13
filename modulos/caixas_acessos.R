@@ -10,10 +10,12 @@ box::use(
 )
 
 box::use(
-  modulos/funcoes_auxiliares[formatar_numero,
-                             calcular_estatistica_coluna],
-  modulos/extras[...]
+    funcoes/funcoes_auxiliares[...],
+    funcoes/extras[...]
 )
+
+
+
 
 #' @export
 ui <- function(id) {

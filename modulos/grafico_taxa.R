@@ -18,7 +18,7 @@ box::use(
 )
 
 box::use(
-  modulos/global[cor_p, cor_s1]
+  ./global[cor_p, cor_s1]
 )
 
 #' @export
@@ -68,7 +68,13 @@ server <- function(id, dados, filtro, total) {
         grafico <- tabela %>%
           #dplyr::select(-semestre) %>% 
           e_chart(Data) %>%
-          e_bar(Acessos, colorBy = "data")  %>% 
+          e_bar(Acessos, colorBy = "data")  %>%
+          e_grid(
+            left = "4%",
+            right = "4%",
+            top = "16,5%",
+            bottom = "9%"
+          ) %>% 
           e_legend(show = FALSE) %>%
           e_tooltip(valueFormatter =  JS('function(value) {
         var fmt = new Intl.NumberFormat("pt-BR",
@@ -86,7 +92,7 @@ server <- function(id, dados, filtro, total) {
         return fmt.format(value);
       }'),
                    axisLabel = list(fontSize = 14)) %>%
-          e_title(text = "Total de acessos por dia, PNAES 2024",
+          e_title(text = "Total de acessos por dia, PNAES 2026",
                   textStyle = list(fontSize = 18,
                                    fontStyle = "normal"),
                   subtext = titulo, 
