@@ -70,8 +70,8 @@ server <- function(id, dados_brasil_filtrado, populacao_brasil_filtrado) {
     validos_brasil <- reactive({
       
       saida <- dados_brasil_filtrado() %>%
-        filter(!is.na(valido)) %>% 
-        filter(valido==1) %>% 
+        filter(!is.na(validos)) %>% 
+        filter(validos == "validos") %>% 
         nrow()
       
       return(saida)

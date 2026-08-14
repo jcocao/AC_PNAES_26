@@ -12,63 +12,51 @@ brasil <- readRDS("data/br_uf_shape.Rds")
 
 
 #' @export
-dados_populacao <- readRDS("data/dados_p.rds") 
+dados_populacao <- readRDS("data/dados_p.rds") %>% 
+  rename(DR = DR2) 
 
 #' @export
 dados_populacao <- dados_populacao %>% 
-  rename(DR = DR2) %>%
   bind_rows(
+    # Cria uma única linha "BR", somando pop_a e pop_p de todos os
+    # estados e semestres (sem manter a quebra por semestre)
     dados_populacao %>%
-      group_by(semestre) %>%
+      ungroup() %>% 
       summarise(
         DR = "BR",
+        semestre = NA,
         pop_a = sum(pop_a, na.rm = TRUE),
-        pop_p = sum(pop_p, na.rm = TRUE),
-        tx = pop_p / pop_a,
-        .groups = "drop"
-      )
-  ) %>% 
-  mutate(validos = "validos")
+        pop_p = sum(pop_p, na.rm = TRUE)
+      ) %>%
+      mutate(tx = pop_p / pop_a)
+  )
+
   
 
 
 #' @export
-dados_primarios <- readRDS("data/dados.rds") 
-  # %>% 
-  # bind_rows(
-  #   # BR por semestre
-  #   dados %>%
-  #     distinct(semestre, DR, Total) %>%
-  #     group_by(semestre) %>%
-  #     summarise(
-  #       DR = "BR",
-  #       Total = sum(Total, na.rm = TRUE),
-  #       .groups = "drop"
-  #     ),
-  #   
-  #   # BR geral
-  #   dados %>%
-  #     distinct(semestre, DR, Total) %>%
-  #     summarise(
-  #       semestre = NA_real_,
-  #       DR = "BR",
-  #       Total = sum(Total, na.rm = TRUE),
-  #       .groups = "drop"
-  #     )
-  # )
-  
+dados_primarios <- readRDS("data/dados.rds") %>% 
+  mutate(validos = "validos") 
+
+#' #' @export
+#' dados_primarios <- dados_primarios %>% 
+#'   bind_rows(
+#'     dados_primarios %>%
+#'       distinct(DR, semestre, Total) %>%
+#'       group_by(semestre) %>%
+#'       summarise(
+#'         DR = "BR",
+#'         dia = NA,
+#'         tempo = NA,
+#'         dt.conclusao = NA,
+#'         Total = sum(Total, na.rm = TRUE),
+#'         .groups = "drop"
+#'       )
+#'   )
 
 
 
 
-# dados_filtrado <- dados %>% 
-#   group_by(semestre, DR) %>%
-#   summarise(
-#     total_acessos = n(),
-#     tempo_medio = mean(`tempo`, na.rm = TRUE),
-#     tempo_mediano = median(`tempo`, na.rm = TRUE),
-#     .groups = "drop"
-#   )
 
 
 #' @export

@@ -58,7 +58,8 @@ box::use(
   modulos/tp_aparelho,
   modulos/populacao_e_cadastro,
   modulos/tabela,
-  modulos/caixas_populacao_brasil
+  modulos/caixas_populacao_brasil,
+  modulos/mapa
 )
 
 
@@ -81,14 +82,14 @@ div(id = "cabecalho",
       label = "Departamento Regional",
       choices = c("Brasil" = "BR",opcoes),
       options = list(dropdownParent = 'body', optgroupField = 'group')
-    ),
-    uiOutput("unidade_selecao"),
-    selectizeInput(
-      inputId = "Semestre",
-      label = "Semestre",
-      choices = opcoes_sm,
-      options = list(dropdownParent = 'body', optgroupField = 'group')
     )
+    # uiOutput("unidade_selecao"),
+    # selectizeInput(
+    #   inputId = "Semestre",
+    #   label = "Semestre",
+    #   choices = opcoes_sm,
+    #   options = list(dropdownParent = 'body', optgroupField = 'group')
+    # )
 )
 
 
@@ -125,18 +126,21 @@ DR_selecionado <- reactive({
 
 })
 
-SM_selecionado <- reactive({
-  req(input$Semestre)
-  req(!is.null(input$Semestre))
-  
-  input$Semestre
-})
+# SM_selecionado <- reactive({
+#   req(input$Semestre)
+#   # req(!is.null(input$Semestre))
+#   
+#   input$Semestre
+# })
 
 populacao_filtrada <- reactive({
   print(DR_selecionado())
   
   saida <- dados_populacao %>% 
-    filter(DR == DR_selecionado())
+    filter(DR == DR_selecionado()
+           # semestre == SM_selecionado()
+    )
+  
   
   saida
 
@@ -151,7 +155,7 @@ populacao_e_cadastro$server("CaixasPopulacao",
 dados_filtrado <- reactive({
 
   req(DR_selecionado())
-  req(SM_selecionado())
+  # req(SM_selecionado())
   
   saida <- dados_primarios
 
@@ -159,10 +163,11 @@ dados_filtrado <- reactive({
 if(DR_selecionado() != "BR"){
 saida <- saida %>% 
             filter(DR == DR_selecionado(),
-                   semestre == SM_selecionado())
+                   # semestre == SM_selecionado()
+            )
 } else {
-  saida <- saida %>% 
-    filter(semestre == SM_selecionado())
+  # saida <- saida %>% 
+  #   filter(semestre == SM_selecionado())
 return(saida)
   
 }
@@ -258,7 +263,14 @@ min_width = "400px",
                  min_height = "750px",
                  tabela$ui("TerceiroSegmento-Tabela")
              )
-        ))
+        ),
+         card(id = "mapa-terceiro-segmento",
+              min_width = "400px",
+              card_body(
+                min_height = "750px",
+                mapa$ui("TerceiroSegmento-Mapa")
+              ))
+)
     )
     )
 
@@ -278,7 +290,7 @@ saida
 dados_filtrados_DR <- reactive({
   req(DR_selecionado())
 
-  saida <- dados_primarios() %>% 
+  saida <- dados_primarios %>% 
     filter(DR == DR_selecionado())
 })
 
@@ -288,13 +300,18 @@ populacao_e_cadastro$server("CaixasPopulacaoDR",
 
 dados_brasil_filtrado <- reactive({
   req(DR_selecionado())
-  dados_primarios() 
+  dados_primarios 
 })
+
+# dados_primarios1 <- reactive({
+#   dados_primarios
+# })
 
 populacao_brasil_filtrado <- reactive({
   req(DR_selecionado())
   dados_populacao %>%
 filter(DR == "BR")
+       # is.na(semestre))
 })
 
 caixas_populacao_brasil$server("TerceiroSegmento-Caixas", 
@@ -304,6 +321,9 @@ caixas_populacao_brasil$server("TerceiroSegmento-Caixas",
 tabela$server("TerceiroSegmento-Tabela", 
               dados_brasil_filtrado)
 
+mapa$server("TerceiroSegmento-Mapa",
+            brasil,
+            dados_brasil_filtrado)
 
 
 ```
