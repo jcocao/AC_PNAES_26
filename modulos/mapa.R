@@ -71,6 +71,7 @@ server <- function(id, brasil, dados) {
       trad$Nomes <- sub("^.*?\\.", "", trad$Nomes)
       
       juncao <- dados %>%
+        filter(valido == "valido") %>% 
         # Calcula taxa de resposta por estado e classifica em faixas
         # comparando com a média nacional
         summarise(Total = sum(unique(Total), na.rm = T),

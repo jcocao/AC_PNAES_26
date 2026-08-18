@@ -71,31 +71,35 @@ box::use(
 #| label: "Titulo do Relatorio"
 ```
 ![](images/banner.svg){width="100%"}
-
+<!--
 ## Row {height = "5%"}
 ```{r}
 #| label: "Selecao-DR"
 
-div(id = "cabecalho",
+div(id = "cabecalho"
+    ,
     selectizeInput(
-      inputId = "DR",
-      label = "Departamento Regional",
-      choices = c("Brasil" = "BR",opcoes),
-      options = list(dropdownParent = 'body', optgroupField = 'group')
-    )
+       inputId = "DR",
+       label = "Departamento Regional",
+       choices = c("Brasil" = "BR",opcoes),
+       options = list(dropdownParent = 'body', optgroupField = 'group')
+     ))
     # uiOutput("unidade_selecao"),
     # selectizeInput(
     #   inputId = "Semestre",
     #   label = "Semestre",
     #   choices = opcoes_sm,
     #   options = list(dropdownParent = 'body', optgroupField = 'group')
-    # )
-)
+    # 
+    #)
+
 
 
 ```
+-->
 
-## Row {height="11%"}
+## Row {height="25%"}
+
 
 ```{r}
 #| label: primeiro-segmento
@@ -106,7 +110,6 @@ uiOutput("PrimeiroSegmento")
 ```{r}
 #| label: processa-dados-primeiro-segmento
 #| context: server
-
 
 
 output$PrimeiroSegmento <- renderUI({
@@ -155,14 +158,13 @@ populacao_e_cadastro$server("CaixasPopulacao",
 dados_filtrado <- reactive({
 
   req(DR_selecionado())
-  # req(SM_selecionado())
   
   saida <- dados_primarios
 
   
 if(DR_selecionado() != "BR"){
 saida <- saida %>% 
-            filter(DR == DR_selecionado(),
+            filter(DR == DR_selecionado()
                    # semestre == SM_selecionado()
             )
 } else {

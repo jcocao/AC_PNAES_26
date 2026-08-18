@@ -12,7 +12,8 @@ box::use(
   dplyr[`%>%`,
         slice,
         pull,
-        filter]
+        filter,
+        summarise]
 )
 
 box::use(
@@ -27,6 +28,13 @@ ui <-  function(id) {
   
   layout_column_wrap(
     width = "400px",
+    selectizeInput(
+      inputId = "DR",
+      label = "Departamento Regional",
+      choices = c("Brasil" = "BR",opcoes),
+      options = list(dropdownParent = 'body', optgroupField = 'group'),
+      width = "100%"
+    ),
     value_box(
       title = "População Alvo:",
       value = textOutput(ns("PopulacaoAlvo")),
@@ -37,16 +45,16 @@ ui <-  function(id) {
       full_screen = FALSE,
       theme = tema_caixa_de_valor
     ),
-    value_box(
-      title = "Total de Acessos:",
-      value = textOutput(ns("TotalAcessos")),
-      showcase = bs_icon("clipboard-data",
-                         size="0.6em"),
-      showcase_layout = "left center",
-      max_height = "150px",
-      full_screen = FALSE,
-      theme = tema_caixa_de_valor
-    ),
+    # value_box(
+    #   title = "Total de Acessos:",
+    #   value = textOutput(ns("TotalAcessos")),
+    #   showcase = bs_icon("clipboard-data",
+    #                      size="0.6em"),
+    #   showcase_layout = "left center",
+    #   max_height = "150px",
+    #   full_screen = FALSE,
+    #   theme = tema_caixa_de_valor
+    # ),
     value_box(
       title = "População Alvo com contato",
       value = textOutput(ns("PopulacaoAlvoContato")),
@@ -75,15 +83,15 @@ ui <-  function(id) {
 server <- function(id, populacao_filtrada,dados_filtrado) {
   moduleServer(id, function(input, output, session) {
     
-    output$TotalAcessos <- renderText({
-      dados <- dados_filtrado()
-      req(nrow(dados) > 0)
-      saida <- nrow(dados_filtrado())
-      
-      saida <- formatar_numero(saida)
-      
-      return(saida)
-    })
+    # output$TotalAcessos <- renderText({
+    #   dados <- dados_filtrado()
+    #   req(nrow(dados) > 0)
+    #   saida <- nrow(dados_filtrado())
+    #   
+    #   saida <- formatar_numero(saida)
+    #   
+    #   return(saida)
+    # })
     
     
     output$PopulacaoAlvo <- renderText({
@@ -92,7 +100,7 @@ server <- function(id, populacao_filtrada,dados_filtrado) {
       
       req(nrow(dados) > 0)
       dados %>%
-        slice(1) %>%
+        summarise(pop_a = sum(pop_a)) %>%
         pull(pop_a) %>% 
         formatar_numero(ndigitos = 0)
     })
@@ -101,7 +109,7 @@ server <- function(id, populacao_filtrada,dados_filtrado) {
       dados <- populacao_filtrada()
       req(nrow(dados) > 0)
       dados %>%
-        slice(1) %>%
+        summarise(pop_p = sum(pop_p)) %>%
         pull(pop_p) %>% 
         formatar_numero(ndigitos = 0)
     })
@@ -110,7 +118,9 @@ server <- function(id, populacao_filtrada,dados_filtrado) {
       dados <- populacao_filtrada()
       req(nrow(dados) > 0)
       dados %>%
-        slice(1) %>%
+        summarise(pop_p = sum(pop_p),
+                  pop_a = sum(pop_a),
+                  tx = pop_p/pop_a) %>%
         pull(tx) %>% formatar_numero(percent = T, 
                                      digitos = 1, 
                                      ndigitos = 1)

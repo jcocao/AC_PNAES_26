@@ -29,16 +29,13 @@ server <- function(id, dados) {
   moduleServer(id, function(input, output, session) {
     
     output$tbl_dr <- renderReactable({
-      # Monta tabela de tradução sigla -> nome completo do estado, para
-      # exibir o nome por extenso na tabela
+
       flat <- unlist(opcoes)
       trad <- data.frame(Nomes = names(flat),
                          DR = unname(flat),
                          stringsAsFactors = FALSE)
       trad$Nomes <- sub("^.*?\\.", "", trad$Nomes)
       
-      # Traduz sigla para nome completo e calcula, por estado, o total
-      # de válidos, a população/base e a taxa de respostas
       dados_t <- dados() %>%
         left_join(trad, by = c("DR")) %>%
         filter(!is.na(valido)) %>%
