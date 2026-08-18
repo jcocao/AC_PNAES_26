@@ -41,14 +41,14 @@ server <- function(id, dados) {
       # de válidos, a população/base e a taxa de respostas
       dados_t <- dados() %>%
         left_join(trad, by = c("DR")) %>%
-        filter(!is.na(validos)) %>%
+        filter(!is.na(valido)) %>%
         mutate(DR = Nomes,
                .keep = "unused") %>%
         group_by(DR) %>%
         filter(DR != "SG") %>%
-        summarise(Validos = sum(validos == "s"),
+        summarise(Valido = sum(valido == "valido"),
                   Total = sum(unique(Total), na.rm = TRUE),
-                  Taxa = (Validos/Total))
+                  Taxa = (Valido/Total))
       
       
       
@@ -79,7 +79,7 @@ server <- function(id, dados) {
                   DR = colDef(
                     name = "Departamento Regional"
                   ),
-                  Validos = colDef(
+                  Valido = colDef(
                     filterable = FALSE,
                     name = "Total de questionários válidos",
                     align = "center",

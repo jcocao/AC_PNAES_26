@@ -54,7 +54,7 @@ server <- function(id, brasil, dados) {
       )
       
       
-      dados <- filter(dados(), !is.na(validos))
+      dados <- filter(dados(), !is.na(valido))
       faixas <- c(0, 0.75, 0.9, 1.1, 1.25, 10)
       media <- dados %>%
         summarise(media = 100 * n()/sum(unique(Total),

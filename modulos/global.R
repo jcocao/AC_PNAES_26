@@ -36,7 +36,8 @@ dados_populacao <- dados_populacao %>%
 
 #' @export
 dados_primarios <- readRDS("data/dados.rds") %>% 
-  mutate(validos = "validos") 
+  mutate(valido = ifelse(!is.na(sit.ocup), "valido", "invalido"))
+
 
 #' #' @export
 #' dados_primarios <- dados_primarios %>% 
