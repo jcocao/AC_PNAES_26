@@ -4,13 +4,15 @@ box::use(
         tooltip],
   dplyr[...],
   tidyr[starts_with],
-  reactable[...]
+  reactable[...],
+  htmltools[div]
 )
 
 
 box::use(
   ./global[cor_tabela],
-  ./carregar_dados[opcoes]
+  ./carregar_dados[opcoes],
+  ./funcoes/funcoes_auxiliares[formatar_numero]
 )
 
 
@@ -80,14 +82,34 @@ server <- function(id, dados) {
                     filterable = FALSE,
                     name = "Total de questionários válidos",
                     align = "center",
+                    cell = function(value) {
+                      div(
+                        style = list(
+                          width = "40px",
+                          textAlign = "right",
+                          margin = "auto",
+                          marginLeft = "70px"
+                        ),
+                        formatar_numero(value)
+                      )},
                     style = list(
                       fontSize = "16px"
-
                     )
                   ),
                   Total = colDef(
                     name = "População Alvo",
-                    align = "center"
+                    align = "center",
+                    cell = function(value) {
+                      div(
+                        style = list(
+                          width = "60px",
+                          textAlign = "right",
+                          margin = "auto",
+                          marginLeft = "62px"
+                        ),
+                        formatar_numero(value)
+                      )
+                    }
                   ),
                   Taxa = colDef(
                     name = "Taxa de resposta (%)",

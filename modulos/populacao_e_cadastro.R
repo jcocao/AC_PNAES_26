@@ -27,6 +27,7 @@ ui <-  function(id) {
   ns <- NS(id)
   
   layout_column_wrap(
+    height = "150px",
     width = "400px",
     selectizeInput(
       inputId = "DR",

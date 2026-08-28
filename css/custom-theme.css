@@ -13,7 +13,7 @@
 }
 
 body {
-  background-image: url('images/plano_de_fundo_div.svg');
+  background-color: #191d48;
   background-size: cover;
   background-position: center top;
   background-repeat: no-repeat;
@@ -21,11 +21,16 @@ body {
   min-height: 100vh;
 }
 
+.card-header.bslib-gap-spacing {
+  padding: 0 !important;
+  margin: 0 !important;
+  min-height: 0 !important;
+}
 
-div.bslib-grid:nth-child(3) > div:nth-child(1) > div:nth-child(1) {
+div.bslib-grid:nth-child(2) > div:nth-child(1) > div:nth-child(1) {
   padding: 0 !important;
 }
-div.bslib-grid:nth-child(5) > div:nth-child(1) > div:nth-child(1){
+div.bslib-grid:nth-child(3) > div:nth-child(1) > div:nth-child(1){
   padding: 0 !important;
 }
 
@@ -84,16 +89,24 @@ img {
 #tipo-de-aparelho,
 #tabela-terceiro-segmento,
 #unidade-terceiro-segmento {
-  border: 1px solid #888;
+  border: 0px solid #888;
 }
 
+.html-widget,
+.plotly,
+.js-plotly-plot {
+  background-color: white; /* ou transparent, dependendo do gráfico */
+}
 .control-label {
   font-weight: bold;
 }
-
+.control-label {
+  color: white;
+}
 
 .card {  
-  --bs-card-cap-bg: #8853c3;
+  background-color: #191d48;
+  --bs-card-cap-bg: /*#527bf8;*/  #8853c3;
   --bs-card-bg: #FAFAFF;
   --bs-card-cap-color: #FAFAFF;
   border: 0;
@@ -109,6 +122,13 @@ img {
   font-weight: 600;
 }
 
+
+.card-grafico,
+.card-grafico .card-body,
+.card-grafico .html-widget {
+  border-radius: 1rem;
+  clip-path: inset(0 round 1rem);
+}
 .bslib-value-box.bg-custom {
   border-radius: 1rem;         /* Arredondamento das bordas */
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) ;  /* Sombra suave */

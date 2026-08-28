@@ -27,8 +27,7 @@ ui <- function(id) {
   
   echarts4rOutput(outputId = ns("chart_tempo_1"))
   
-  
-  
+
 }
 
 #' @export
@@ -70,11 +69,11 @@ server <- function(id, dados, filtro, total) {
           e_chart(Data) %>%
           e_bar(Acessos, colorBy = "data")  %>%
           e_grid(
-            left = "4%",
-            right = "4%",
-            top = "16,5%",
-            bottom = "9%"
-          ) %>% 
+            left = "7%",
+            right = "7%",
+            top = "19%",
+            bottom = "12%"
+          ) %>%
           e_legend(show = FALSE) %>%
           e_tooltip(valueFormatter =  JS('function(value) {
         var fmt = new Intl.NumberFormat("pt-BR",

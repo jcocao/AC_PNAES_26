@@ -70,7 +70,7 @@ box::use(
 ```{r}
 #| label: "Titulo do Relatorio"
 ```
-![](images/banner.svg){width="100%"}
+![](images/Banner_2026-1.png){width="100%"}
 <!--
 ## Row {height = "5%"}
 ```{r}
@@ -189,20 +189,35 @@ return(saida)
 ```{r}
 #| label: segundo-segmento
 
-card(
+uiOutput("segundoSegmento")
+
+```
+
+
+```{r}
+#| label: processa-dados-segundo-segmento
+#| context: server
+
+
+
+output$segundoSegmento <- renderUI({
+saida <-   card(
   card_header("Informações do acesso ao questionário"),
   card_body(
     layout_columns(
       col_widths = c(3, 5, 4),
       caixas_acessos$ui("SegundoSegmento-Caixas"),
-      card(id = "grafico-taxa-resposta",
+      card(
+        id = "grafico-taxa-resposta",
+        class = "card-grafico",
         height = "400px",
         card_body_fill(
           grafico_taxa$ui("SegundoSegmento-Acessos")
         )
       ),
       card(
-        max_height = "600px",
+        class = "card-grafico",
+        height = "400px",
         card_body(id = "tipo-de-aparelho",
           tp_aparelho$ui("SegundoSegmento-TipoDeAparelho")
         )
@@ -211,13 +226,8 @@ card(
     )
   )
 )
-
-```
-
-
-```{r}
-#| label: processa-dados-segundo-segmento
-#| context: server
+saida
+})
 
 caixas_acessos$server("SegundoSegmento-Caixas", 
                       dados_filtrado)

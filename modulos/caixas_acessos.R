@@ -7,6 +7,7 @@ box::use(
         textOutput,
         renderText, 
         req],
+  htmltools[div]
 )
 
 box::use(
@@ -21,7 +22,6 @@ box::use(
 ui <- function(id) {
   
   ns <- NS(id)
-  
   layout_column_wrap(
     width = 1,
     value_box(
@@ -55,7 +55,8 @@ ui <- function(id) {
       theme = tema_caixa_de_valor
     )
   )
-}
+
+  }
 
 #' @export
 server <- function(id, dados_filtrado) {
