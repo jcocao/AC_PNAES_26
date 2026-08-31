@@ -2,17 +2,6 @@ box::use(
   dplyr[...]
 )
 
-
-
-
-
-
-
-
-
-
-
-
 #' @export
 opcoes <- list(Norte = c(Acre = "AC", 
                          `Amapá` = "AP",
@@ -52,8 +41,44 @@ opcoes_sm <- c(`Primeiro semestre` = 1,
 
 
 
+# SharePoint — Configurações ----------------------------------------------
+
+PASTA_SHAREPOINT <- "00 - Area de Influencia/pnaes"
+ARQ_DADOS <- "dados.Rds"
+
+token_sp <- get_azure_token(
+  resource = "https://graph.microsoft.com",
+  tenant = Sys.getenv("CLIMICROSOFT365_TENANT"),
+  app = Sys.getenv("CLIMICROSOFT365_AADAPPID"),
+  password = Sys.getenv("secret_id"),
+  auth_type = "client_credentials"
+)
+
+site <- get_sharepoint_site(
+  site_url = "https://senacnacional.sharepoint.com/sites/GerProspecAvalEducacional",
+  token = token_sp
+)
+drive <- site$get_drive("Documentos")
 
 
+#' @export
+dados_sharepoint <- function() reactivePoll(
+  intervalMillis = 60 * 1000,
+  session = NULL,
+  
+  checkFunc = function() {
+    drive$get_item_properties(file.path(PASTA_SHAREPOINT, 
+                                        ARQ_DADOS))$fileSystemInfo$lastModifiedDateTime
+  },
+  
+  valueFunc = function() {
+    baixar_rds_sharepoint(drive,
+                          file.path(PASTA_SHAREPOINT, 
+                                    ARQ_DADOS)
+    ) 
+    
+  }
+)
 
 
 

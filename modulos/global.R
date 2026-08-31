@@ -11,7 +11,7 @@ box::use(
 brasil <- readRDS("data/br_uf_shape.Rds")
 
 
-#' @export
+
 dados_populacao <- readRDS("data/dados_p.rds") %>% 
   rename(DR = DR2) 
 
@@ -31,37 +31,9 @@ dados_populacao <- dados_populacao %>%
       mutate(tx = pop_p / pop_a)
   )
 
-  
-
-
 #' @export
 dados_primarios <- readRDS("data/dados.rds") %>% 
   mutate(valido = ifelse(!is.na(sit.ocup), "valido", "invalido"))
-
-
-#' #' @export
-#' dados_primarios <- dados_primarios %>% 
-#'   bind_rows(
-#'     dados_primarios %>%
-#'       distinct(DR, semestre, Total) %>%
-#'       group_by(semestre) %>%
-#'       summarise(
-#'         DR = "BR",
-#'         dia = NA,
-#'         tempo = NA,
-#'         dt.conclusao = NA,
-#'         Total = sum(Total, na.rm = TRUE),
-#'         .groups = "drop"
-#'       )
-#'   )
-
-
-
-
-
-
-#' @export
-pop1 <- 400000
 
 #' @export
 titulo_mapa <- tags$div(
