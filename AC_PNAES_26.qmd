@@ -98,7 +98,7 @@ div(id = "cabecalho"
 ```
 -->
 
-## Row {height="25%"}
+## Row {height="25%" .no-padding}
 
 
 ```{r}
@@ -115,7 +115,9 @@ uiOutput("PrimeiroSegmento")
 output$PrimeiroSegmento <- renderUI({
 saida <- card(
 card_header("População e cadastro"),
+card_body(
 populacao_e_cadastro$ui("CaixasPopulacao")
+)
 )
 
 saida
@@ -184,7 +186,7 @@ return(saida)
 
 
 
-## Row {height="33%"}
+## Row {height="33%" .no-padding}
 
 ```{r}
 #| label: segundo-segmento
@@ -242,7 +244,7 @@ tp_aparelho$server("SegundoSegmento-TipoDeAparelho",
 
 ```
 
-## Row {height="46%"}
+## Row {height="46%" .no-padding}
 
 ```{r}
 #| label: terceiro-segmento
@@ -266,7 +268,8 @@ saida <- card(
     card_header("Questionários válidos e Taxa de resposta",
     ),
     
-    card_body(layout_columns(
+    card_body(
+              layout_columns(
         col_widths = c(4, 4, 4, 6,6),
         !!!caixas_populacao_brasil$ui("TerceiroSegmento-Caixas"),
         card(id = "tabela-terceiro-segmento",
