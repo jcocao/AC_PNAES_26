@@ -1,5 +1,5 @@
 ---
-title: Painel de Acompanhamento Pesquisa de Diversidade 2026
+title: Painel de Acompanhamento da Pesquisa de Acompanhamento dos Egressos Senac 2026
 format: 
   dashboard:
     scrolling: true

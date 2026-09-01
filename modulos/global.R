@@ -15,8 +15,6 @@ dados_populacao <- readRDS("data/dados_p.rds") %>%
 #' @export
 dados_populacao <- dados_populacao %>% 
   bind_rows(
-    # Cria uma única linha "BR", somando pop_a e pop_p de todos os
-    # estados e semestres (sem manter a quebra por semestre)
     dados_populacao %>%
       ungroup() %>% 
       summarise(

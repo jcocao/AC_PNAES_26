@@ -1,5 +1,7 @@
 box::use(
-  dplyr[...]
+  dplyr[...],
+  AzureAuth[get_azure_token],
+  Microsoft365R[get_sharepoint_site]
 )
 
 #' @export
@@ -34,10 +36,11 @@ opcoes <- list(Norte = c(Acre = "AC",
 
 
 
-# SharePoint — Configurações ----------------------------------------------
+#' # SharePoint — Configurações ----------------------------------------------
 
 PASTA_SHAREPOINT <- "00 - Area de Influencia/pnaes"
 ARQ_DADOS <- "dados.Rds"
+ARQ_DADOS_P <- "dados_p.Rds"
 
 token_sp <- get_azure_token(
   resource = "https://graph.microsoft.com",
@@ -58,17 +61,17 @@ drive <- site$get_drive("Documentos")
 dados_sharepoint <- function() reactivePoll(
   intervalMillis = 60 * 1000,
   session = NULL,
-  
+
   checkFunc = function() {
-    drive$get_item_properties(file.path(PASTA_SHAREPOINT, 
+    drive$get_item_properties(file.path(PASTA_SHAREPOINT,
                                         ARQ_DADOS))$fileSystemInfo$lastModifiedDateTime
   },
-  
+
   valueFunc = function() {
     baixar_rds_sharepoint(drive,
-                          file.path(PASTA_SHAREPOINT, 
+                          file.path(PASTA_SHAREPOINT,
                                     ARQ_DADOS)
-    ) 
-    
+    )
+
   }
 )

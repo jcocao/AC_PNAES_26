@@ -26,7 +26,6 @@ INTERVALO_SEGUNDOS <- 60L
 
 PASTA_SHAREPOINT <- "00 - Area de Influencia/pnaes"
 ARQ_POP <- "pop2.Rds"
-ARQ_POP_2 <- "dados_p.Rds"
 ARQ_DADOS <- "dados.Rds"
 ARQ_LOG <- "log_pnaes.txt"
 
@@ -414,15 +413,13 @@ atualizar_dados <- function(
                     ~ na_if(., "")))
     
     painel <- pesquisa |>
-      select(cpf,
-             dia,
+      select(dia,
              tempo,
+             sit.ocup,
              dt.conclusao,
              DR = DR2,
-             cod.unidade,
-             tp.aparelho,
-             valido,
-             Total) |>
+             Total,
+             tp.aparelho)|>
       as_tibble() |>
       mutate(DR2 = case_when(DR == "AC" ~ "12",
                              DR == "AL" ~ "27",
@@ -451,12 +448,9 @@ atualizar_dados <- function(
                              DR == "SE" ~ "28",
                              DR == "SP" ~ "35",
                              DR == "TO" ~ "17",
-                             .default = NA_character_),
-             cod.unidade = paste(DR,
-                                 cod.unidade,
-                                 sep = "-"))
+                             .default = NA_character_))
     
-    
+    cat("Cheguei aqui de boa!")
     
     enviar_rds_sharepoint(
       painel,
@@ -464,15 +458,6 @@ atualizar_dados <- function(
       file.path(
         PASTA_SHAREPOINT,
         ARQ_DADOS
-      )
-    )
-    
-    enviar_rds_sharepoint(
-      pesquisa,
-      drive,
-      file.path(
-        PASTA_SHAREPOINT,
-        ARQ_EXTRA
       )
     )
     
