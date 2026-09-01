@@ -1,12 +1,14 @@
 box::use(
   bslib[value_box,
-        value_box_theme],
+        value_box_theme,
+        tooltip],
   bsicons[bs_icon],
   shiny[NS,
         moduleServer,
         textOutput,
         renderText,
-        reactive],
+        reactive,
+        span],
   dplyr[...]
 )
 
@@ -22,7 +24,10 @@ ui <- function(id) {
   
   list(
     value_box(
-      title = "População Alvo do Brasil:",
+      title = span("População de Pesquisa do Brasil",
+                   tooltip(bs_icon("info-circle",
+                                   title = "Definição de população"),
+                           "População alvo com e-mail cadastrado.")),
       value = textOutput(ns("PopulacaoAlvo")),
       showcase = bs_icon("people-fill",
                          size="0.6em"),
@@ -61,8 +66,8 @@ server <- function(id, dados_brasil_filtrado, populacao_brasil_filtrado) {
     
     popbrasil <- reactive({
       saida <- populacao_brasil_filtrado() %>% 
-        summarise(pop_a = sum(pop_a, na.rm = T)) %>% 
-        pull(pop_a)
+        summarise(pop_p = sum(pop_p, na.rm = T)) %>% 
+        pull(pop_p)
       
       return(saida)
     })

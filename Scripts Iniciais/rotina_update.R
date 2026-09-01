@@ -278,6 +278,7 @@ atualizar_dados <- function(
       ) |>
       req_url_query(
         variables = paste(c("termo",
+                            "termo_confirmacao",
                             "cpf",
                             "q2_01",
                             "q2_02",
@@ -302,6 +303,7 @@ atualizar_dados <- function(
     pesquisa <- pesquisa |>
       select(
         termo,
+        termo_confirmacao,
         cpf,
         q2_01,
         q2_02,
@@ -324,17 +326,41 @@ atualizar_dados <- function(
       )
     
     pesquisa <- pesquisa |>
-      mutate(ocupado = ifelse(q2_01 %in% "Sim" |
-                                (q2_02 %in% "Sim" & (q2_03 %in% "Férias, folga ou jornada de trabalho variável"|
-                                                       q2_03 %in% "Licença maternidade ou paternidade"|
-                                                       q2_03 %in% "Licença remunerada por motivo de saúde ou por ter se acidentado"|
-                                                       q2_03 %in% "Outro tipo de licença remunerada (estudo, casamento, licença prêmio etc.)")) |
-                                (q2_02 %in% "Sim" & (q2_03 %in% "Afastamento do próprio negócio/empresa, sem ser remunerado por instituto de previdência"|
-                                                       q2_03 %in% "Fatores ocasionais (má condição climática, paralisação nos serviços de transporte, greve etc.)"|
-                                                       q2_03 %in% "Outro motivo") & q2_04 %in% "Não"), 1, 0),
-             desocupado = ifelse(q2_07 %in% "Sim" & q2_08 %in% "Sim", 1, 0),
-             inativo    = ifelse(q2_07 %in% "Não" | (q2_07 %in% "Sim" & q2_08 %in% "Não"), 1, 0),
-             sit.ocup   = ifelse(ocupado == 1, "Ocupado", 
+      mutate(ocupado = case_when(
+        termo == "Não" & termo_confirmacao == "Sim, tenho certeza" ~ 0,
+        termo == "Não" & nchar(termo_confirmacao) == 0 ~ 0,
+        q2_01 %in% "Sim" |(q2_02 %in% "Sim" &
+             (q2_03 %in% c(
+               "Férias, folga ou jornada de trabalho variável",
+               "Licença maternidade ou paternidade",
+               "Licença remunerada por motivo de saúde ou por ter se acidentado",
+               "Outro tipo de licença remunerada (estudo, casamento, licença prêmio etc.)"
+             ))) |
+          (q2_02 %in% "Sim" &
+             q2_03 %in% c(
+               "Afastamento do próprio negócio/empresa, sem ser remunerado por instituto de previdência",
+               "Fatores ocasionais (má condição climática, paralisação nos serviços de transporte, greve etc.)",
+               "Outro motivo"
+             ) &
+             q2_04 %in% "Não") ~ 1,
+        TRUE ~ 0
+      ),
+      
+      desocupado = case_when(
+        termo == "Não" & termo_confirmacao == "Sim, tenho certeza" ~ 0,
+        termo == "Não" & nchar(termo_confirmacao) == 0 ~ 0,
+        q2_07 %in% "Sim" & q2_08 %in% "Sim" ~ 1,
+        TRUE ~ 0
+      ),
+      
+      inativo = case_when(
+        termo == "Não" & termo_confirmacao == "Sim, tenho certeza" ~ 0,
+        termo == "Não" & nchar(termo_confirmacao) == 0 ~ 0,
+        q2_07 %in% "Não" |
+          (q2_07 %in% "Sim" & q2_08 %in% "Não") ~ 1,
+        TRUE ~ 0
+      ),
+      sit.ocup   = ifelse(ocupado == 1, "Ocupado", 
                                  ifelse(desocupado == 1, "Desocupado",
                                         ifelse(inativo == 1, "Inativo", NA))),
              dt.entrada = as_datetime(dt.entrada,
@@ -449,8 +475,6 @@ atualizar_dados <- function(
                              DR == "SP" ~ "35",
                              DR == "TO" ~ "17",
                              .default = NA_character_))
-    
-    cat("Cheguei aqui de boa!")
     
     enviar_rds_sharepoint(
       painel,
@@ -576,7 +600,8 @@ repeat {
       )
     }
     
-  }, error = function(e) {
+  },
+  error = function(e) {
     
     mensagem <- paste0(
       "ERRO no loop principal | ",
@@ -602,7 +627,7 @@ repeat {
     )
   })
   
-  if (Sys.Date() >= as.Date("2026-08-25")) {
+  if (Sys.Date() >= as.Date("2026-10-08")) {
     break
   }
 }

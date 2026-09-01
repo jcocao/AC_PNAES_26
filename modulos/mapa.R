@@ -79,7 +79,7 @@ server <- function(id, brasil, dados) {
                   .by = DR) %>%
         left_join(trad, by = "DR") %>% 
         mutate(
-          Taxa = round(100 * Taxa/Total, 1),
+          Taxa = round(100 * Taxa/Total, 2),
           Tx = cut(Taxa,
                    breaks = faixas * media,
                    labels = c(

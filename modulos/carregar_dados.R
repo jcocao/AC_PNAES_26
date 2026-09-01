@@ -1,5 +1,6 @@
 box::use(
-  shiny[reactivePoll],
+  shiny[reactivePoll,
+        isRunning],
   dplyr[...],
   AzureAuth[get_azure_token],
   Microsoft365R[get_sharepoint_site]
@@ -39,7 +40,7 @@ baixar_rds_sharepoint <- function(drive, caminho_remoto) {
 preparar_dados_populacao <- function(dados) {
   dados <- dados |>
     rename(DR = DR2)
-
+  
   dados |>
     bind_rows(
       dados |>
@@ -51,7 +52,8 @@ preparar_dados_populacao <- function(dados) {
           pop_p = sum(pop_p, na.rm = TRUE)
         ) |>
         mutate(tx = pop_p / pop_a)
-    )
+    ) |>
+    ungroup()
 }
 
 #' @export
@@ -67,22 +69,32 @@ dados_populacao <- preparar_dados_populacao(
 
 #' @export
 dados_sharepoint <- function() {
-  reactivePoll(
-    intervalMillis = 60 * 1000,
-    session = NULL,
-    checkFunc = function() {
-      drive$get_item_properties(
-        file.path(PASTA_SHAREPOINT, ARQ_DADOS)
-      )$fileSystemInfo$lastModifiedDateTime
-    },
-    valueFunc = function() {
-      baixar_rds_sharepoint(
-        drive,
-        file.path(PASTA_SHAREPOINT, ARQ_DADOS)
-      ) |>
-        mutate(
-          valido = ifelse(!is.na(sit.ocup), "valido", "invalido")
-        )
-    }
-  )
+  if(isRunning()){
+    reactivePoll(
+      intervalMillis = 60 * 1000,
+      session = NULL,
+      checkFunc = function() {
+        drive$get_item_properties(
+          file.path(PASTA_SHAREPOINT, ARQ_DADOS)
+        )$fileSystemInfo$lastModifiedDateTime
+      },
+      valueFunc = function() {
+        baixar_rds_sharepoint(
+          drive,
+          file.path(PASTA_SHAREPOINT, ARQ_DADOS)
+        ) |>
+          mutate(
+            valido = ifelse(!is.na(sit.ocup), "valido", "invalido")
+          )
+      }
+    )
+  } else {
+    baixar_rds_sharepoint(
+      drive,
+      file.path(PASTA_SHAREPOINT, ARQ_DADOS)
+    ) |>
+      mutate(
+        valido = ifelse(!is.na(sit.ocup), "valido", "invalido")
+      )
+  }
 }
