@@ -7,3 +7,5 @@
 **/*.quarto_ipynb
 
 AC_PNAES_26_files/
+
+docs/ARQUITETURA.md
