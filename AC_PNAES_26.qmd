@@ -71,32 +71,6 @@ box::use(
 #| label: "Titulo do Relatorio"
 ```
 ![](images/Banner_2026-1.png){width="100%"}
-<!--
-## Row {height = "5%"}
-```{r}
-#| label: "Selecao-DR"
-
-div(id = "cabecalho"
-    ,
-    selectizeInput(
-       inputId = "DR",
-       label = "Departamento Regional",
-       choices = c("Brasil" = "BR",opcoes),
-       options = list(dropdownParent = 'body', optgroupField = 'group')
-     ))
-    # uiOutput("unidade_selecao"),
-    # selectizeInput(
-    #   inputId = "Semestre",
-    #   label = "Semestre",
-    #   choices = opcoes_sm,
-    #   options = list(dropdownParent = 'body', optgroupField = 'group')
-    # 
-    #)
-
-
-
-```
--->
 
 ## Row {height="25%" .no-padding}
 
@@ -131,20 +105,11 @@ DR_selecionado <- reactive({
 
 })
 
-# SM_selecionado <- reactive({
-#   req(input$Semestre)
-#   # req(!is.null(input$Semestre))
-#   
-#   input$Semestre
-# })
-
 populacao_filtrada <- reactive({
   print(DR_selecionado())
   
   saida <- dados_populacao %>% 
-    filter(DR == DR_selecionado()
-           # semestre == SM_selecionado()
-    )
+    filter(DR == DR_selecionado())
   
   
   saida
@@ -152,8 +117,7 @@ populacao_filtrada <- reactive({
 })
 
 populacao_e_cadastro$server("CaixasPopulacao", 
-                             populacao_filtrada,
-                            dados_filtrado)
+                             populacao_filtrada)
 
 
 
@@ -166,12 +130,8 @@ dados_filtrado <- reactive({
   
 if(DR_selecionado() != "BR"){
 saida <- saida %>% 
-            filter(DR == DR_selecionado()
-                   # semestre == SM_selecionado()
-            )
+            filter(DR == DR_selecionado())
 } else {
-  # saida <- saida %>% 
-  #   filter(semestre == SM_selecionado())
 return(saida)
   
 }
@@ -292,41 +252,15 @@ min_width = "400px",
 saida
 })
 
-populacao_filtrada_DR <- reactive({
-  
-  req(DR_selecionado())
-
-  saida <- dados_populacao %>% 
-    filter(DR == DR_selecionado())
-
-saida
-})
-
-dados_filtrados_DR <- reactive({
-  req(DR_selecionado())
-
-  saida <- dados_primarios %>% 
-    filter(DR == DR_selecionado())
-})
-
-populacao_e_cadastro$server("CaixasPopulacaoDR", 
-                             populacao_filtrada_DR,
-                            dados_filtrados_DR)
-
 dados_brasil_filtrado <- reactive({
   req(DR_selecionado())
   dados_primarios 
 })
 
-# dados_primarios1 <- reactive({
-#   dados_primarios
-# })
-
 populacao_brasil_filtrado <- reactive({
   req(DR_selecionado())
   dados_populacao %>%
 filter(DR == "BR")
-       # is.na(semestre))
 })
 
 caixas_populacao_brasil$server("TerceiroSegmento-Caixas", 

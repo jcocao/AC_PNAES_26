@@ -31,21 +31,18 @@ ui <- function(id) {
 }
 
 #' @export
-server <- function(id, dados, filtro, total) {
+server <- function(id, dados, filtro) {
   moduleServer(id, function(input, output, session) {
     
     output$chart_tempo_1 <- renderEcharts4r({
       
       if(length(filtro()) < 1){
         linha <- "."
-        check <- F
       } else {
         if(filtro() == "BR"){
           linha <- "."
-          check <- F
         }else{
           linha <- filtro()
-          check <- T
         }
       }
       

@@ -34,13 +34,6 @@ opcoes <- list(Norte = c(Acre = "AC",
 
 
 
-#' @export
-opcoes_sm <- c(`Primeiro semestre` = 1,
-               `Segundo semestre` = 2)
-
-
-
-
 # SharePoint — Configurações ----------------------------------------------
 
 PASTA_SHAREPOINT <- "00 - Area de Influencia/pnaes"
@@ -79,11 +72,3 @@ dados_sharepoint <- function() reactivePoll(
     
   }
 )
-
-
-
-
-
-
-
-

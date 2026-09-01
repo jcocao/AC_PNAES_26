@@ -7,7 +7,6 @@ box::use(
         selectizeInput,
         textOutput,
         renderText,
-        reactive,
         req],
   dplyr[`%>%`,
         slice,
@@ -46,16 +45,6 @@ ui <-  function(id) {
       full_screen = FALSE,
       theme = tema_caixa_de_valor
     ),
-    # value_box(
-    #   title = "Total de Acessos:",
-    #   value = textOutput(ns("TotalAcessos")),
-    #   showcase = bs_icon("clipboard-data",
-    #                      size="0.6em"),
-    #   showcase_layout = "left center",
-    #   max_height = "150px",
-    #   full_screen = FALSE,
-    #   theme = tema_caixa_de_valor
-    # ),
     value_box(
       title = "População Alvo com contato",
       value = textOutput(ns("PopulacaoAlvoContato")),
@@ -81,20 +70,9 @@ ui <-  function(id) {
 
 #' @export
 
-server <- function(id, populacao_filtrada,dados_filtrado) {
+server <- function(id, populacao_filtrada) {
   moduleServer(id, function(input, output, session) {
-    
-    # output$TotalAcessos <- renderText({
-    #   dados <- dados_filtrado()
-    #   req(nrow(dados) > 0)
-    #   saida <- nrow(dados_filtrado())
-    #   
-    #   saida <- formatar_numero(saida)
-    #   
-    #   return(saida)
-    # })
-    
-    
+
     output$PopulacaoAlvo <- renderText({
       
       dados <- populacao_filtrada()
@@ -126,7 +104,5 @@ server <- function(id, populacao_filtrada,dados_filtrado) {
                                      digitos = 1, 
                                      ndigitos = 1)
     })
-    
-    return(reactive(input$DR))
   })
 }

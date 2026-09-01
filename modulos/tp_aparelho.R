@@ -2,7 +2,7 @@ box::use(
   shiny[moduleServer, NS, renderPlot, plotOutput, strong],
   bslib[card_header,card_body],
   dplyr[tibble, `%>%`, count, n, summarise,
-        group_by, mutate, filter, case_when],
+        group_by, mutate, filter],
   echarts4r[...],
   stringr[str_detect],
   htmlwidgets[JS]
@@ -31,46 +31,14 @@ server <- function(id, dados, filtro) {
     output$grafico_dr_1 <- renderEcharts4r({
       if(length(filtro()) < 1){
         linha <- "."
-        check <- F
       } else {
         if(filtro() == "BR"){
           linha <- "."
-          check <- F
         }else{
           linha <- filtro()
-          check <- T
         }
       }
-      
-      titulo <- case_when(linha == "AC" ~ "Acre",
-                          linha == "AL" ~ "Alagoas",
-                          linha == "AM" ~ "Amazonas",
-                          linha == "AP" ~ "Amapá",
-                          linha == "BA" ~ "Bahia",
-                          linha == "CE" ~ "Ceará",
-                          linha == "DF" ~ "Distrito Federal",
-                          linha == "ES" ~ "Espírito Santo",
-                          linha == "GO" ~ "Goiás",
-                          linha == "MA" ~ "Maranhão",
-                          linha == "MG" ~ "Minas Gerais",
-                          linha == "MS" ~ "Mato Grosso do Sul",
-                          linha == "MT" ~ "Mato Grosso",
-                          linha == "PA" ~ "Pará",
-                          linha == "PB" ~ "Paraíba",
-                          linha == "PE" ~ "Pernambuco",
-                          linha == "PI" ~ "Piaúi",
-                          linha == "PR" ~ "Paraná",
-                          linha == "RJ" ~ "Rio de Janeiro",
-                          linha == "RN" ~ "Rio Grande do Norte",
-                          linha == "RO" ~ "Rondônia",
-                          linha == "RR" ~ "Roraima",
-                          linha == "RS" ~ "Rio Grande do Sul",
-                          linha == "SC" ~ "Santa Catarina",
-                          linha == "SE" ~ "Sergipe",
-                          linha == "SP" ~ "São Paulo",
-                          linha == "TO" ~ "Tocantins",
-                          .default = "Brasil")
-      
+
       dados_aqui <- dados() %>%
         filter(str_detect(DR, linha)) %>%
         count(tp.aparelho, name = "Quantidade", sort = T)
@@ -108,7 +76,6 @@ server <- function(id, dados, filtro) {
                                     borderWidth =  0.5),
                    selectedMode = FALSE) %>%
           e_title(text = "Distribuição dos acessos, por tipo de aparelho utilizado,\nPNAES 2026",
-                  #subtext = titulo,
                   textStyle = list(fontSize = 18,
                                    fontStyle = "normal")) %>% 
           e_show_loading(text = "Carregando",
