@@ -17,8 +17,8 @@ box::use(
 )
 
 box::use(
-  ./global[...],
-  ./carregar_dados[opcoes]
+  ./global[opcoes, palheta_mapa],
+  ./carregar_dados[brasil]
 )
 #' @export
 ui <- function(id) {

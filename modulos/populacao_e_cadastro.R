@@ -16,7 +16,7 @@ box::use(
 )
 
 box::use(
-  ./carregar_dados[opcoes],
+  ./global[opcoes],
   funcoes/funcoes_auxiliares[formatar_numero],
   funcoes/extras[...]
 )

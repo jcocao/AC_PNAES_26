@@ -86,6 +86,8 @@ uiOutput("PrimeiroSegmento")
 #| context: server
 
 
+dados_primarios <- dados_sharepoint()
+
 output$PrimeiroSegmento <- renderUI({
 saida <- card(
 card_header("População e cadastro"),
@@ -124,8 +126,9 @@ populacao_e_cadastro$server("CaixasPopulacao",
 dados_filtrado <- reactive({
 
   req(DR_selecionado())
+  req(dados_primarios())
   
-  saida <- dados_primarios
+  saida <- dados_primarios()
 
   
 if(DR_selecionado() != "BR"){
@@ -253,8 +256,8 @@ saida
 })
 
 dados_brasil_filtrado <- reactive({
-  req(DR_selecionado())
-  dados_primarios 
+  req(dados_primarios())
+  dados_primarios()
 })
 
 populacao_brasil_filtrado <- reactive({

@@ -10,8 +10,8 @@ box::use(
 
 
 box::use(
-  ./global[cor_tabela],
-  ./carregar_dados[opcoes],
+  ./global[cor_tabela, 
+           opcoes],
   ./funcoes/funcoes_auxiliares[formatar_numero]
 )
 

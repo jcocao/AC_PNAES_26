@@ -1,42 +1,11 @@
 box::use(
+  shiny[reactivePoll],
   dplyr[...],
   AzureAuth[get_azure_token],
   Microsoft365R[get_sharepoint_site]
 )
 
-#' @export
-opcoes <- list(Norte = c(Acre = "AC", 
-                         `Amapá` = "AP",
-                         Amazonas = "AM", 
-                         `Pará` = "PA", 
-                         `Rondônia` = "RO",
-                         Roraima = "RR",
-                         Tocantins = "TO"),
-               Nordeste = c(Alagoas = "AL",
-                            Bahia = "BA",
-                            `Ceará` = "CE", 
-                            `Maranhão` = "MA",
-                            `Paraíba` = "PB", 
-                            Pernambuco = "PE",
-                            `Piauí` = "PI",
-                            `Rio Grande do Norte` = "RN", 
-                            Sergipe = "SE"),
-               `Centro-Oeste` = c(`Distrito Federal` = "DF", 
-                                  `Goiás` = "GO",
-                                  `Mato Grosso` = "MT",
-                                  `Mato Grosso do Sul` = "MS"),
-               Sudeste = c(`Espírito Santo` = "ES",
-                           `Minas Gerais` = "MG", 
-                           `Rio de Janeiro` = "RJ",
-                           `São Paulo` = "SP"),
-               Sul = c(`Paraná` = "PR", 
-                       `Rio Grande do Sul` = "RS",
-                       `Santa Catarina` = "SC"),
-               `Departamento Nacional` = list(`Senac Gastronomia` = "SG"))
-
-
-
-#' # SharePoint — Configurações ----------------------------------------------
+# SharePoint — Configurações ----------------------------------------------
 
 PASTA_SHAREPOINT <- "00 - Area de Influencia/pnaes"
 ARQ_DADOS <- "dados.Rds"
@@ -56,22 +25,64 @@ site <- get_sharepoint_site(
 )
 drive <- site$get_drive("Documentos")
 
+baixar_rds_sharepoint <- function(drive, caminho_remoto) {
+  tmp <- tempfile(fileext = ".Rds")
+  on.exit(unlink(tmp), add = TRUE)
+  drive$download_file(
+    src = caminho_remoto,
+    dest = tmp,
+    overwrite = TRUE
+  )
+  readRDS(tmp)
+}
+
+preparar_dados_populacao <- function(dados) {
+  dados <- dados |>
+    rename(DR = DR2)
+
+  dados |>
+    bind_rows(
+      dados |>
+        ungroup() |>
+        summarise(
+          DR = "BR",
+          semestre = NA,
+          pop_a = sum(pop_a, na.rm = TRUE),
+          pop_p = sum(pop_p, na.rm = TRUE)
+        ) |>
+        mutate(tx = pop_p / pop_a)
+    )
+}
 
 #' @export
-dados_sharepoint <- function() reactivePoll(
-  intervalMillis = 60 * 1000,
-  session = NULL,
+brasil <- readRDS("data/br_uf_shape.Rds")
 
-  checkFunc = function() {
-    drive$get_item_properties(file.path(PASTA_SHAREPOINT,
-                                        ARQ_DADOS))$fileSystemInfo$lastModifiedDateTime
-  },
-
-  valueFunc = function() {
-    baixar_rds_sharepoint(drive,
-                          file.path(PASTA_SHAREPOINT,
-                                    ARQ_DADOS)
-    )
-
-  }
+#' @export
+dados_populacao <- preparar_dados_populacao(
+  baixar_rds_sharepoint(
+    drive,
+    file.path(PASTA_SHAREPOINT, ARQ_DADOS_P)
+  )
 )
+
+#' @export
+dados_sharepoint <- function() {
+  reactivePoll(
+    intervalMillis = 60 * 1000,
+    session = NULL,
+    checkFunc = function() {
+      drive$get_item_properties(
+        file.path(PASTA_SHAREPOINT, ARQ_DADOS)
+      )$fileSystemInfo$lastModifiedDateTime
+    },
+    valueFunc = function() {
+      baixar_rds_sharepoint(
+        drive,
+        file.path(PASTA_SHAREPOINT, ARQ_DADOS)
+      ) |>
+        mutate(
+          valido = ifelse(!is.na(sit.ocup), "valido", "invalido")
+        )
+    }
+  )
+}
