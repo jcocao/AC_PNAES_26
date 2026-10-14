@@ -16,7 +16,8 @@ box::use(
   ],
   AzureAuth[get_azure_token],
   Microsoft365R[get_sharepoint_site],
-  readr[read_csv]
+  readr[read_csv],
+  stringr[str_detect]
 )
 
 ano <- "2026"
@@ -114,7 +115,7 @@ registrar_log <- function(mensagem, drive = NULL) {
   invisible(linha)
 }
 
-# Autenticação Microsoft / SharePoint ----------------------------------------
+# Autenticação Microsoft / SharePoint -----------------------------------------
 
 token_sp <- get_azure_token(
   resource = "https://graph.microsoft.com",
@@ -325,39 +326,62 @@ atualizar_dados <- function(
         by = "cpf"
       )
     
+    pesquisa <- pesquisa %>%
+      mutate(
+        q2_01 = case_when(q2_01 == "Sim" ~ 1,
+                          nchar(q2_01) == 0 ~ NA, 
+                          T ~ 0),
+        q2_02 = case_when(q2_02 == "Sim" ~ 1,
+                          nchar(q2_02) == 0 ~ NA, 
+                          T ~ 0),
+        q2_04 = case_when(q2_04 == "Sim" ~ 1,
+                          nchar(q2_04) == 0 ~ NA, 
+                          T ~ 0),
+        q2_07 = case_when(q2_07 == "Sim" ~ 1,
+                          nchar(q2_07) == 0 ~ NA, 
+                          T ~ 0),
+        q2_08 = case_when(q2_08 == "Sim" ~ 1,
+                          nchar(q2_08) == 0 ~ NA, 
+                          T ~ 0),
+        q2_03 = case_when(
+          str_detect(q2_03, "Afastamento") ~ 1,
+          str_detect(q2_03, "Fatores ocasionais") ~ 2,
+          str_detect(q2_03, "folga ou jornada") ~ 3,
+          str_detect(q2_03, "maternidade") ~ 4,
+          str_detect(q2_03, "acidentado") ~ 5,
+          str_detect(q2_03, "Outro motivo") ~ 6,
+          str_detect(q2_03, "Outro tipo de") ~ 7,
+          nchar(q2_03) == 0 ~ NA_real_)
+      )
+    
+    
     pesquisa <- pesquisa |>
       mutate(ocupado = case_when(
-        termo == "Não" & termo_confirmacao == "Sim, tenho certeza" ~ 0,
-        termo == "Não" & nchar(termo_confirmacao) == 0 ~ 0,
-        q2_01 %in% "Sim" |(q2_02 %in% "Sim" &
-             (q2_03 %in% c(
-               "Férias, folga ou jornada de trabalho variável",
-               "Licença maternidade ou paternidade",
-               "Licença remunerada por motivo de saúde ou por ter se acidentado",
-               "Outro tipo de licença remunerada (estudo, casamento, licença prêmio etc.)"
-             ))) |
-          (q2_02 %in% "Sim" &
+        termo == 0 & termo_confirmacao == "Sim, tenho certeza" & !is.na(termo) ~ 0,
+        termo == 0 & nchar(termo_confirmacao) == 0 & !is.na(termo) ~ 0,
+        q2_01 == 1 |(q2_02 == 1 &
+             (q2_03 %in% c(3,4,5,7))) |
+          (q2_02 %in% 1 &
              q2_03 %in% c(
-               "Afastamento do próprio negócio/empresa, sem ser remunerado por instituto de previdência",
-               "Fatores ocasionais (má condição climática, paralisação nos serviços de transporte, greve etc.)",
-               "Outro motivo"
-             ) &
-             q2_04 %in% "Não") ~ 1,
+               1,
+               2,
+               6) &
+             q2_04 %in% 0) ~ 1,
         TRUE ~ 0
       ),
       
       desocupado = case_when(
-        termo == "Não" & termo_confirmacao == "Sim, tenho certeza" ~ 0,
-        termo == "Não" & nchar(termo_confirmacao) == 0 ~ 0,
-        q2_07 %in% "Sim" & q2_08 %in% "Sim" ~ 1,
+        termo %in% 0 & termo_confirmacao == "Sim, tenho certeza" ~ 0,
+        termo %in% 0 & nchar(termo_confirmacao) == 0 & !is.na(termo) ~ 0,
+        q2_07 %in% 1 & q2_08 %in% 1 ~ 1,
         TRUE ~ 0
       ),
       
       inativo = case_when(
-        termo == "Não" & termo_confirmacao == "Sim, tenho certeza" ~ 0,
-        termo == "Não" & nchar(termo_confirmacao) == 0 ~ 0,
-        q2_07 %in% "Não" |
-          (q2_07 %in% "Sim" & q2_08 %in% "Não") ~ 1,
+        termo %in% 0 & termo_confirmacao == "Sim, tenho certeza" ~ 0,
+        termo %in% 0 & nchar(termo_confirmacao) == 0 & !is.na(termo) ~ 0,
+        q2_07 %in% 0 |
+          (q2_07 %in% 1 & q2_08 %in% 0) ~ 1,
         TRUE ~ 0
       ),
       sit.ocup   = ifelse(ocupado == 1, "Ocupado", 
@@ -413,10 +437,10 @@ atualizar_dados <- function(
                                    pad = "0")
              ),
              tempo = round(as.numeric(tempo) / 60, 2),
-             finalizado = ifelse(termo == "Sim" & sit.quest == "Terminado",
+             finalizado = ifelse(termo == 1 & sit.quest == "Terminado",
                                  1,
                                  0),
-             incompleto = ifelse(termo == "Sim" & sit.quest == "Em andamento",
+             incompleto = ifelse(termo == 1 & sit.quest == "Em andamento",
                                  1,
                                  0),
              id.pesquisa = row_number(),
@@ -429,6 +453,7 @@ atualizar_dados <- function(
                 q2_02,
                 q2_07,
                 q2_08))
+
     
     pesquisa <- left_join(pesquisa, 
                           pop,
@@ -474,7 +499,10 @@ atualizar_dados <- function(
                              DR == "SE" ~ "28",
                              DR == "SP" ~ "35",
                              DR == "TO" ~ "17",
-                             .default = NA_character_))
+                             .default = NA_character_)) |>
+      mutate(
+        valido = ifelse(!is.na(sit.ocup), "valido", "invalido")
+      )
     
     enviar_rds_sharepoint(
       painel,
@@ -484,6 +512,28 @@ atualizar_dados <- function(
         ARQ_DADOS
       )
     )
+    
+    dados_origem <- pesquisa |>
+      select(cpf,
+             dia,
+             tempo,
+             sit.ocup,
+             dt.conclusao,
+             DR = DR2,
+             Total,
+             tp.aparelho,
+             origem)|>
+      as_tibble()
+    
+    enviar_rds_sharepoint(
+      dados_origem,
+      drive,
+      file.path(
+        PASTA_SHAREPOINT,
+        "dados_origem.Rds"
+      )
+    )
+    
     
     n_linhas <- nrow(painel)
     
@@ -573,9 +623,7 @@ repeat {
         ultima_contagem <- contagem
         
         message(
-          "Atualização concluída com sucesso. ",
-          "recordsCount: ",
-          contagem
+          "Atualização concluída com sucesso."
         )
         
         gc()
@@ -627,7 +675,7 @@ repeat {
     )
   })
   
-  if (Sys.Date() >= as.Date("2026-10-08")) {
+  if (Sys.Date() >= as.Date("2026-10-14")) {
     break
   }
 }

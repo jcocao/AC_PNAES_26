@@ -29,7 +29,7 @@ ui <-  function(id) {
   
   layout_column_wrap(
     min_height = "150px",
-    width = "400px",
+    width = "300px",
     selectizeInput(
       inputId = "DR",
       label = "Selecione o Departamento Regional",

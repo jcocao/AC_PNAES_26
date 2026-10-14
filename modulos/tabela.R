@@ -12,7 +12,8 @@ box::use(
 box::use(
   ./global[cor_tabela, 
            opcoes],
-  ./funcoes/funcoes_auxiliares[formatar_numero]
+  ./funcoes/funcoes_auxiliares[formatar_numero],
+  ./carregar_dados[dados_populacao]
 )
 
 
@@ -38,15 +39,18 @@ server <- function(id, dados) {
                          stringsAsFactors = FALSE)
       trad$Nomes <- sub("^.*?\\.", "", trad$Nomes)
       
+      pop_pesquisa <- dados_populacao %>% summarise(pop_p = sum(pop_p), .by = "DR")
+      
       dados_t <- dados() %>%
         left_join(trad, by = c("DR")) %>%
+        left_join(pop_pesquisa, by = "DR") %>%
         filter(!is.na(valido)) %>%
         mutate(DR = Nomes,
                .keep = "unused") %>%
         group_by(DR) %>%
-        filter(DR != "SG") %>%
+        filter(DR != "SG") %>% 
         summarise(Valido = sum(valido == "valido"),
-                  Total = sum(unique(Total), na.rm = TRUE),
+                  Total = unique(pop_p),
                   Taxa = (Valido/Total))
       
       
@@ -82,41 +86,29 @@ server <- function(id, dados) {
                     filterable = FALSE,
                     name = "Total de questionários válidos",
                     align = "center",
-                    cell = function(value) {
-                      div(
-                        style = list(
-                          width = "40px",
-                          textAlign = "right",
-                          margin = "auto",
-                          marginLeft = "70px"
-                        ),
-                        formatar_numero(value)
-                      )},
+                    format = colFormat(separators = TRUE,
+                                       percent = FALSE,
+                                       digits = 0,
+                                       locales = "pt-BR"),
                     style = list(
                       fontSize = "16px"
                     )
                   ),
                   Total = colDef(
-                    name = "População Alvo",
+                    name = "População de Pesquisa",
                     align = "center",
-                    cell = function(value) {
-                      div(
-                        style = list(
-                          width = "60px",
-                          textAlign = "right",
-                          margin = "auto",
-                          marginLeft = "62px"
-                        ),
-                        formatar_numero(value)
-                      )
-                    }
+                    format = colFormat(separators = TRUE,
+                                       percent = FALSE,
+                                       digits = 0,
+                                       locales = "pt-BR")
                   ),
                   Taxa = colDef(
                     name = "Taxa de resposta (%)",
                     filterable = FALSE,
                     format = colFormat(separators = TRUE,
                                        percent = TRUE,
-                                       digits = 2),
+                                       digits = 2,
+                                       locales = "pt-BR"),
                     align = "center",
                     style = list(
                       fontSize = "16px"

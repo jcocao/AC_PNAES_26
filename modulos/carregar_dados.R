@@ -82,19 +82,13 @@ dados_sharepoint <- function() {
         baixar_rds_sharepoint(
           drive,
           file.path(PASTA_SHAREPOINT, ARQ_DADOS)
-        ) |>
-          mutate(
-            valido = ifelse(!is.na(sit.ocup), "valido", "invalido")
-          )
+        )
       }
     )
   } else {
     baixar_rds_sharepoint(
       drive,
       file.path(PASTA_SHAREPOINT, ARQ_DADOS)
-    ) |>
-      mutate(
-        valido = ifelse(!is.na(sit.ocup), "valido", "invalido")
-      )
+    )
   }
 }

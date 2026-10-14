@@ -13,7 +13,8 @@ box::use(
   stats[quantile],
   sf[...],
   purrr[map2],
-  tidyr[replace_na]
+  tidyr[replace_na],
+  glue[glue]
 )
 
 box::use(
@@ -55,7 +56,7 @@ server <- function(id, brasil, dados) {
       
       
       dados <- filter(dados(), !is.na(valido))
-      faixas <- c(0, 0.75, 0.9, 1.1, 1.25, 10)
+      faixas <- c(0, 2, 3, 4, 5, 100)
       media <- dados %>%
         summarise(media = 100 * n()/sum(unique(Total),
                                         na.rm = T)) %>%
@@ -81,13 +82,13 @@ server <- function(id, brasil, dados) {
         mutate(
           Taxa = round(100 * Taxa/Total, 2),
           Tx = cut(Taxa,
-                   breaks = faixas * media,
-                   labels = c(
-                     "Abaixo - 25% ou mais",
-                     "Abaixo - 10% a 25%",
-                     "Entre 10% abaixo e 10% acima",
-                     "Acima - 10% a 25%",
-                     "Acima - 25% ou mais"
+                   breaks = faixas ,
+                   labels =  c(
+                     glue::glue("Menor que {faixas[2]}%"),
+                     glue::glue("De {faixas[2]}% até menos de {faixas[3]}%"),
+                     glue::glue("De {faixas[3]}% até menos de {faixas[4]}%"),
+                     glue::glue("De {faixas[4]}% até menos de {faixas[5]}%"),
+                     glue::glue("Igual ou superior a {faixas[5]}%")
                    ),
                    right = F
           ),
